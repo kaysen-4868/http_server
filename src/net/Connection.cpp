@@ -25,16 +25,14 @@ Connection::Connection(EventLoop* loop,int fd)
     //注册进EVentloop
     loop_->addFd(fd_,EPOLLIN);//默认只关注可读
 
-    //用weak_ptr防止回调里长期持有conn导致无法释放
-    std::weak_ptr<Connection>weak_self=shared_from_this();
-
-    loop_->setReadCallback(fd_,[this,weak_self]()
+    
+    loop_->setReadCallback(fd_,[this]()
 {
     //如果对象已销毁，shared_from_this会抛异常，这里直接判断
     handleRead();
 });
 
-   loop_->setWriteCallback(fd_,[this,weak_self]()
+   loop_->setWriteCallback(fd_,[this]()
 {
     handleWrite();
 });

@@ -11,7 +11,8 @@ add_compile_options(-Wall -Wextra -g)
 add_executable(http_server 
             src/main.cpp
             src/net/EventLoop.cpp
-            src/net/Acceptor.cpp)
+            src/net/Acceptor.cpp
+            src/net/Connection.cpp)
 
 target_include_directories(http_server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
