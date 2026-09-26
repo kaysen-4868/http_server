@@ -10,6 +10,7 @@
 #include<cstring>
 #include<stdexcept>
 #include<iostream>
+#include<sys/epoll.h>
 
 Acceptor::Acceptor(EventLoop* loop,int port)
 : loop_(loop)
