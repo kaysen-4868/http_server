@@ -14,7 +14,7 @@ class HttpResponse
     std::string toString()const
     {
         std::string result;
-        result+="HTTP/1.1"+std::to_string(status_code)
+        result+="HTTP/1.1 "+std::to_string(status_code)
         +" "+status_message+"\r\n";
 
         for(const auto& [k,v]:headers)

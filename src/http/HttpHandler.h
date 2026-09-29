@@ -11,6 +11,7 @@ inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp)
         resp.status_message="Method Not Allowed";
         resp.headers["Content-Type"]="text/plain";
         resp.body="405 Method Not Allowed\n";
+        resp.headers["Content-Length"]=std::to_string(resp.body.size());
         return ;
     }
 
@@ -19,11 +20,16 @@ inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp)
         resp.status_code=200;
         resp.status_message="OK";
         resp.headers["Content-Type"]="text/html";
-        resp.body="<h1>Hello,HTTP!<h1>\n";
+        resp.body="<h1>Hello,HTTP!</h1>\n";
+        resp.headers["Content-Length"]=std::to_string(resp.body.size());
+        
+
+        return ;
     }
 
     resp.status_code=404;
     resp.status_message="Not Found";
     resp.headers["Content-Type"]="text/plain";
     resp.body="404 Not Found\n";
+    resp.headers["Content-Length"]=std::to_string(resp.body.size());
 }

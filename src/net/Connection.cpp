@@ -46,6 +46,7 @@ Connection::~Connection()
         loop_->removed(fd_);
         loop_->clearCallbacks(fd_);
         ::close(fd_);
+        //  std::cout << "[析构] Connection fd=" << fd_ << " 被销毁" << std::endl;
     }
 }
 
