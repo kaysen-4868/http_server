@@ -3,7 +3,8 @@
 #include "http/HttpRequest.h"
 #include "http/HttpResponse.h"
 
-inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp)
+inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp,
+                              StaticFileHandler& handler)
 {
     if(req.method!="GET")
     {
@@ -14,6 +15,7 @@ inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp)
         resp.headers["Content-Length"]=std::to_string(resp.body.size());
         return ;
     }
+    handler.handle(req,resp);
 
     if(req.path=="/")
     {
@@ -32,4 +34,5 @@ inline void handleHttpRequest(const HttpRequest& req,HttpResponse& resp)
     resp.headers["Content-Type"]="text/plain";
     resp.body="404 Not Found\n";
     resp.headers["Content-Length"]=std::to_string(resp.body.size());
+    
 }

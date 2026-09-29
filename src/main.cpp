@@ -4,6 +4,7 @@
 #include "http/HttpContext.h"//每条连接的HTTP解析上下文
 #include "http/HttpResponse.h"//HTTP响应对象
 #include "http/HttpHandler.h"//业务层:根据请求生成响应
+#include "http/StaticFileHandler.h"
 
 #include<unordered_map>
 #include<memory>
@@ -18,6 +19,7 @@ int main()
     EventLoop loop;
     Acceptor acceptor(&loop,8080);
 
+    auto file_handler =std::make_shared<StaticFileHandler>("www");
     //全局连接表
     //用shared_ptr<map>是为了让多个Lamda共享同一份表
     //如果用值捕获，则改变的只是副本，无法互相同步
