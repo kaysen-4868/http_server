@@ -13,7 +13,8 @@ add_executable(http_server
             src/net/EventLoop.cpp
             src/net/Acceptor.cpp
             src/net/Connection.cpp
-            src/http/HttpParser.cpp)
+            src/http/HttpParser.cpp
+            src/http/StaticFileHandler.cpp)
 
 target_include_directories(http_server PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

@@ -29,14 +29,14 @@ int main()
     //注册新链接到来的回调
     //没accept到一个新的fd，就会调用对应的lambda
     acceptor.setNewConnectionCallback(
-      [&loop,conns,contexts](int client_fd)
+      [&loop,conns,contexts,file_handler](int client_fd)
       {
         //为新链接创建Connection对象(shared_ptr持有，因为回调要长期持有)
         auto conn=std::make_shared<Connection>(&loop,client_fd);
         (*contexts)[client_fd]=std::make_shared<HttpContext>();
         //为这条连接创建HTTP解析上下文
         conn->setMessageCallback(
-          [contexts](const std::shared_ptr<Connection>&c)
+          [contexts,file_handler](const std::shared_ptr<Connection>&c)
           {
             //找到这条连接对应的解析上下文
             auto it=contexts->find(c->fd());
@@ -71,7 +71,7 @@ int main()
 
             //业务层根据请求生成响应
             HttpResponse resp;
-            handleHttpRequest(req,resp);
+            handleHttpRequest(req,resp,*file_handler);
             c->send(resp.toString());
 
             //关键 重置解析上下文 准备解析下一条请求

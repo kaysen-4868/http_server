@@ -6,6 +6,7 @@
 #include<limits.h>
 #include<stdlib.h>
 #include<sys/stat.h>
+#include<iostream>
 
 StaticFileHandler::StaticFileHandler(std::string root_dir)
 :root_dir_(std::move(root_dir))
@@ -25,6 +26,7 @@ void StaticFileHandler::handle(const HttpRequest&req,HttpResponse& resp)
         resp.status_message=msg;
         resp.headers["Content-Type"]="text/plain";
         resp.body=std::to_string(code)+" "+msg+"\n";
+        resp.headers["Content-Length"]=std::to_string(resp.body.size());
     };
 
     //去掉query strig ?后面的部分
