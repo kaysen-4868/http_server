@@ -81,6 +81,14 @@ void StaticFileHandler::handle(const HttpRequest&req,HttpResponse& resp)
         }
         real_path=index_path;
      }
+
+     //读文件前先检查大小
+     struct stat st2;
+     if(stat(real_path.c_str(),&st2)==0&&st2.st_size>(off_t)MAX_FILE_SIZE)
+     {
+        setError(413,"Payload Too Large");
+        return ;
+     }
      
      //读文件
      std::string content;
@@ -95,6 +103,7 @@ void StaticFileHandler::handle(const HttpRequest&req,HttpResponse& resp)
      resp.status_message="OK";
      resp.headers["Content-Type"]=getMimeType(real_path);
      resp.body=std::move(content);
+     resp.headers["Content-Length"]=std::to_string(resp.body.size());
 
 }
 

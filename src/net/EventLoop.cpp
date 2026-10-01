@@ -55,7 +55,13 @@ void EventLoop::loop()
         //先处理事故/挂起：直接跳过EPOLLIN/EPOLLOUT处理
         if(revents&(EPOLLHUP|EPOLLERR))
         {
-            //先置空
+             // 直接关闭这条连接
+             auto it = read_callbacks_.find(fd);
+             if (it != read_callbacks_.end() && it->second) 
+            {
+             it->second();   // 让 Connection 自己去 close（读到最后会得到 n=0 或错误）
+            }
+             continue;   // 不再处理这个 fd 的其它事件
         }
 
         //EPOLLIN有数据可读/新链接

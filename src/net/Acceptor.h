@@ -28,9 +28,11 @@ class Acceptor
     private:
     //listen_fd 可读时触发，循环accpet到EAGAIN
     void handleAccept();
+    void handleEmfile();
 
     EventLoop* loop_;
     int listen_fd_;
     int port_;
+    int idle_fd_;//预留的空闲fd
     NewConnectionCallback new_conn_cb_;
 };

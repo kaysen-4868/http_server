@@ -134,6 +134,8 @@ void Connection::handleWrite()
 
 void Connection::flushOutput()
 {
+    if(closed_)return;
+
     while(!output_buffer_.empty())
     {
         ssize_t n=::write(fd_,output_buffer_.data(),output_buffer_.size());
@@ -157,6 +159,15 @@ void Connection::flushOutput()
             }
             std::cerr<<"Connection:write错误 fd="<<fd_
             <<":"<<strerror(errno)<<"\n";
+            close();
+            return;
+        }
+    }
+
+    if(output_buffer_.empty())
+    {
+        if(close_after_write_)
+        {
             close();
             return;
         }

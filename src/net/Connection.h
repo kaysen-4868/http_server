@@ -36,6 +36,13 @@ class Connection:public std::enable_shared_from_this<Connection>
     //主动关闭连接
     void close();
 
+    bool close_after_write_=false;
+    void closeAfterWrite()
+    {
+        close_after_write_=true;
+        if(output_buffer_.empty())close();
+    }
+
     private:
     void handleRead();//EPOLLIN触发 读到EAGAIN，追加到input_buffer_，回调
     void handleWrite();//EPOLLOUT触发 继续发out_buffer_

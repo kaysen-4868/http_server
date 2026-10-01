@@ -11,6 +11,7 @@
 #include<stdexcept>
 #include<iostream>
 #include<sys/epoll.h>
+#include<fcntl.h>
 
 Acceptor::Acceptor(EventLoop* loop,int port)
 : loop_(loop)
@@ -20,6 +21,13 @@ Acceptor::Acceptor(EventLoop* loop,int port)
     if(loop_==nullptr)
     {
         throw std::runtime_error("Acceptor: EventLoop不能为空");
+    }
+
+    //预留一个空闲fd,用于处理EMFILE
+    idle_fd_=::open("/dev/null",O_RDONLY|O_CLOEXEC);
+    if(idle_fd_==-1)
+    {
+        throw std::runtime_error("Acceptor:无法打开/dev/null");
     }
 }
 
@@ -33,6 +41,27 @@ Acceptor::~Acceptor()
         ::close(listen_fd_);
         listen_fd_=-1;
     }
+    if(idle_fd_!=-1)
+    {
+        ::close(idle_fd_);
+        idle_fd_=-1;
+    }
+}
+
+void Acceptor::handleEmfile()
+{
+    //经典trick:关掉空闲fd,accept一个，关掉，再重新打开空闲fd
+    ::close(idle_fd_);
+
+    int client_fd=::accept(listen_fd_,nullptr,nullptr);
+    if(client_fd!=-1)
+    {
+        ::close(client_fd);//立刻关掉，给客户端一个rst
+    }
+        idle_fd_=::open("/dev/null",O_RDONLY|O_CLOEXEC);
+
+        std::cerr<<"Acceptor:文件描述符耗尽，拒绝新连接\n";
+    
 }
 
 //===========设置新连接回调============
@@ -123,7 +152,7 @@ void Acceptor::handleAccept()
         if(errno==EMFILE||errno==ENFILE)
         {
             //达到进程fd上限
-            std::cerr<<"accept失败:文件描述符耗尽（"<<strerror(errno)<<")\n";
+            handleEmfile();
             break;
         }
 

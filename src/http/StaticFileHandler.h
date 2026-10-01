@@ -7,6 +7,8 @@
 class StaticFileHandler
 {
     public:
+
+    static const size_t MAX_FILE_SIZE=10*1024*1024;//10MB
     explicit StaticFileHandler(std::string root_dir);
 
     //根据请求填充响应：文件存在->200 不存在->404 越权->403

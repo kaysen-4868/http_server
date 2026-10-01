@@ -9,12 +9,15 @@
 #include<unordered_map>
 #include<memory>
 #include<iostream>
+#include<csignal>
 
 int main()
 {
 
   try
   {
+    //忽略EPIPE
+    signal(SIGPIPE, SIG_IGN);
     //创建事件循环加监听器
     EventLoop loop;
     Acceptor acceptor(&loop,8080);
@@ -72,7 +75,19 @@ int main()
             //业务层根据请求生成响应
             HttpResponse resp;
             handleHttpRequest(req,resp,*file_handler);
+
+            if(req.version=="HTTP/1.0"||req.version=="HTTP/1.0\r")
+            {
+              resp.headers["Connection"]="close";
+            }
             c->send(resp.toString());
+            
+            //如果本次要关闭，发送完就关
+            if(resp.headers.count("Connection")&&resp.headers["Connection"]=="close")
+            {
+              c->closeAfterWrite();
+              return;
+            }
 
             //关键 重置解析上下文 准备解析下一条请求
             //HTTP/1.1 keep-alive 下 同一链接可能有多条请求

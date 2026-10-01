@@ -26,6 +26,14 @@ bool HttpParser::parse(std::string& buf)
         {
             std::string line;
             if(!extractLine(buf,line))return false;
+            header_bytes_+=line.size()+2;
+
+            if(header_bytes_>MAX_HEADER_SIZE)
+            {
+                state_=State::ERROR;
+                return false;
+            }
+
             if(!parseRequestLine(line)){state_=State::ERROR;return false;}
             state_=State::HEADERS;
         }
@@ -33,6 +41,13 @@ bool HttpParser::parse(std::string& buf)
         {
             std::string line;
             if(!extractLine(buf,line))return false;
+            header_bytes_+=line.size()+2;
+
+            if(header_bytes_>MAX_HEADER_SIZE)
+            {
+                state_=State::ERROR;
+                return false;
+            }
 
             if(line.empty())
             {
@@ -66,8 +81,9 @@ bool HttpParser::parseHeaderLine(const std::string& line)
     std::string key=line.substr(0,colon);
     std::string value=line.substr(colon+1);
 
-    size_t start=value.find_first_not_of("\t");
-    if(start!=std::string::npos)value=value.substr(start);
+    size_t start=value.find_first_not_of(" \t");
+    size_t end = value.find_last_not_of(" \t");
+    if(start!=std::string::npos)value=value.substr(start,end-start+1);
     else value.clear();
 
     std::transform(key.begin(),key.end(),key.begin(),[](unsigned char c){return std::tolower(c);});
@@ -79,4 +95,5 @@ void HttpParser::reset()
 {
     state_=State::REQUEST_LINE;
     request_.reset();
+    header_bytes_=0;
 }

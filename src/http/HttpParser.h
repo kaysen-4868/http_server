@@ -14,6 +14,9 @@ class HttpParser
         ERROR
     };
 
+    //请求头最大字节数(含请求行，所有头，空行)
+    static const size_t MAX_HEADER_SIZE=8*1024;//8kb
+
     bool parse(std::string& buf);
     void reset();
     
@@ -29,4 +32,5 @@ class HttpParser
 
     State state_ =State::REQUEST_LINE;
     HttpRequest request_;
+    size_t header_bytes_=0;//已消费的头部字节数
 };
