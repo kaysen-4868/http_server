@@ -5,6 +5,7 @@
 #include "http/HttpResponse.h"//HTTP响应对象
 #include "http/HttpHandler.h"//业务层:根据请求生成响应
 #include "http/StaticFileHandler.h"
+#include "util/Logger.h"
 
 #include<unordered_map>
 #include<memory>
@@ -69,8 +70,9 @@ int main()
 
             //情况C: 解析成功 交给业务层处理
             const HttpRequest& req=ctx->request();
-            std::cout<<"请求:"<<req.method<<" "
-            <<req.path<<" "<<req.version<<"\n";
+
+            Logger::info("请求:",req.method," "
+            ,req.path," ",req.version);
 
             //业务层根据请求生成响应
             HttpResponse resp;
@@ -101,7 +103,7 @@ int main()
               //从两张表里移除这条连接
               conns->erase(c->fd());
               contexts->erase(c->fd());
-              std::cout<<"连接已清理fd="<<c->fd()<<"\n";
+              Logger::info("(连接已被清理 fd=",c->fd());
             }
           );
 
@@ -113,7 +115,7 @@ int main()
 
       //启动监听并进入事件循环
       acceptor.listen();
-      std::cout<<"HTTP服务器启动,监听8080\n";
+      Logger::info("HTTP服务器启动,监听8080");
       loop.loop();//阻塞直到服务器结束
   }
   catch(const std::exception& e)

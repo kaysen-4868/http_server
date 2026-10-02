@@ -1,1 +1,22 @@
+# 构建产物
 build/
+cmake-build-*/
+*.o
+*.a
+*.so
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*~
+
+# 编译文件
+http_server
+
+# 测试文件（大文件）
+www/big.bin
+www/huge.bin
+
+# 系统文件
+.DS_Store
